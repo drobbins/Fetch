@@ -17,17 +17,22 @@ http.createServer(function (req, res) {
 
             var fetch_url, protocol, client;
             fetch_url = url.parse(req.url, true).query.get;
-            protocol = url.parse(fetch_url).protocol;
 
-            if (protocol === "https:") {
-                client = https;
+            if (!fetch_url) {
+                res.end("No 'get' query parameter provided");
             } else {
-                client = http;
-            }
+                protocol = url.parse(fetch_url).protocol;
 
-            client.get(fetch_url, function (fetch_res) {
-                fetch_res.pipe(res);
-            });
+                if (protocol === "https:") {
+                    client = https;
+                } else {
+                    client = http;
+                }
+
+                client.get(fetch_url, function (fetch_res) {
+                    fetch_res.pipe(res);
+                });
+            }
 
         }
     });
