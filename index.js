@@ -15,13 +15,14 @@ http.createServer(function (req, res) {
             res.end();
         } else {
 
-            var fetch_url, protocol, client;
+            var fetch_url, protocol, client, options;
             fetch_url = url.parse(req.url, true).query.get;
 
             if (!fetch_url) {
                 res.end("No 'get' query parameter provided");
             } else {
-                protocol = url.parse(fetch_url).protocol;
+                options = url.parse(fetch_url);
+                protocol = options.protocol;
 
                 if (protocol === "https:") {
                     client = https;
@@ -29,7 +30,15 @@ http.createServer(function (req, res) {
                     client = http;
                 }
 
-                client.get(fetch_url, function (fetch_res) {
+                options.headers = {};
+                if (req.headers["if-modified-since"]) {
+                    options.headers["if-modified-since"] = req.headers["if-modified-since"];
+                }
+                if (req.headers["if-none-match"]) {
+                    options.headers["if-none-match"] = req.headers["if-none-match"];
+                }
+
+                client.get(options, function (fetch_res) {
                     Object.keys(fetch_res.headers).forEach( function (header) {
                         res.setHeader(header, fetch_res.headers[header]);
                     });
