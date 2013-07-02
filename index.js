@@ -15,19 +15,19 @@ http.createServer(function (req, res) {
             res.end();
         } else {
 
-            var fetch_url, protocol;
+            var fetch_url, protocol, client;
             fetch_url = url.parse(req.url, true).query.get;
             protocol = url.parse(fetch_url).protocol;
 
             if (protocol === "https:") {
-                https.get(fetch_url, function (fetch_res) {
-                    fetch_res.pipe(res);
-                });
+                client = https;
             } else {
-                http.get(fetch_url, function (fetch_res) {
-                    fetch_res.pipe(res);
-                });
+                client = http;
             }
+
+            client.get(fetch_url, function (fetch_res) {
+                fetch_res.pipe(res);
+            });
 
         }
     });
