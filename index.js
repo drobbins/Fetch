@@ -30,6 +30,9 @@ http.createServer(function (req, res) {
                 }
 
                 client.get(fetch_url, function (fetch_res) {
+                    Object.keys(fetch_res.headers).forEach( function (header) {
+                        res.setHeader(header, fetch_res.headers[header]);
+                    });
                     fetch_res.pipe(res);
                 });
             }
